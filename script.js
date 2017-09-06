@@ -48,8 +48,60 @@ function addAlbum() {
         "image": image.name
     });
 
+//issaugoti duomenis i localeStorage
+// i viena rakta saugom visa albumu sarasa
+let albumsJson = JSON.stringify(albumlist);
+localStorage.setItem("albums", albumsJson);
+
     console.log("atlikejas...", artist, album, release, image);
 }
+
+
+// Duomenu atvaizdavimas
+let albumListElement = document.querySelector(".album-list");
+let result = `
+   <div class="album">
+       <img src="img/R-365109-1390519203-2623.jpeg.jpg" alt="Chemical Brothers - Push the button">
+       <h2>Chemical Brothers <span>Push the button</span></h2>
+       <date>2004</date>
+   </div>
+`;
+
+function renderAlbums() {
+// gauname albumus is localStorage ir sukuriam objekta
+let albumsJSON = localStorage.getItem("albums");
+let albums = JSON.parse(albumsJSON);
+
+console.log("albumsJSON:",  albumsJSON);
+//patikrinta ar yra issaugotu albumu
+//jei nera nutraukiam funkcijos vykdyma
+if (!albums)return;
+//jei yra kuriame cikla ir i rezultata susidedam visu albumu HTML
+let result = "";
+for (let albums of albums){
+    result += `
+   <div class="album">
+       <img src="img/${album.image}" alt="Chemical Brothers - Push the button">
+       <h2>Chemical Brothers <span>Push the button</span></h2>
+       <date>2004</date>
+   </div>
+`;
+
+
+}
+let result = `
+   <div class="album">
+       <img src="img/R-365109-1390519203-2623.jpeg.jpg" alt="Chemical Brothers - Push the button">
+       <h2>Chemical Brothers <span>Push the button</span></h2>
+       <date>2004</date>
+   </div>
+`;
+//spausdinam rezultata i "album-list"
+}
+renderAlbums();
+
+
+albumListElement.innerHTML = result
 
 
 
