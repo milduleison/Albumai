@@ -1,0 +1,18 @@
+{
+  "albums": [
+    {
+      "id": 1,
+      "artist": "John Legend",
+      "album": "Love in the Future",
+      "date": "2013",
+      "image": "R-5165503-1386275991-7849.jpeg.jpg"
+    },
+    {
+      "artist": "Test",
+      "album": "Test",
+      "date": "2015",
+      "image": "R-365109-1390519203-2623.jpeg.jpg",
+      "id": 2
+    }
+  ]
+}
