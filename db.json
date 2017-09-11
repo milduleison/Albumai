@@ -2,17 +2,19 @@
   "albums": [
     {
       "id": 1,
-      "artist": "John Legend",
-      "album": "Love in the Future",
+      "artist": "Benjamin Clementine",
+      "album": "Cornerstone",
       "date": "2013",
-      "image": "R-5165503-1386275991-7849.jpeg.jpg"
+      "image": "R-5165503-1386275991-7849.jpeg.jpg",
+      "genre": "Pop"
     },
     {
-      "artist": "Test",
-      "album": "Test",
-      "date": "2015",
+      "artist": "Chemical Brothers",
+      "album": "Push the button",
+      "date": "2004",
       "image": "R-365109-1390519203-2623.jpeg.jpg",
-      "id": 2
+      "id": 2,
+      "genre": "Pop Rock"
     }
   ]
 }
