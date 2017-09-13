@@ -1,38 +1,17 @@
-
-var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkime jį kintamąjam
-    let titleElement = document.getElementsByClassName("main-title")[0];
-
-
-    // Pakeiskime H1 title pavadinima
-    titleElement.innerHTML = "Muzikos albumai";
-
-
-    // Pridėkime padildomą klasę H1
-    titleElement.classList.add("header-title");
-
-
-    // Pakeiskime stiliųs
-    titleElement.style.fontStyle = "italic";
-
+var app = (function () {
 
     // Surandame formos mygtuką "Pridėti"
     // suras pirmą DOM elementą su klase .btn-save-album
     let addAlbumButton = document.querySelector(".btn-save-album");
 
-    // metodas .querySelectorAll() suranda visus elementus su klase .btn-save-album
-    // let addAlbumButton = document.querySelectorAll(".btn-save-album");
-
     // Kai paspaudžiamas mygtukas, vykdyk addAlbum funkciją
     addAlbumButton.addEventListener("click", addAlbum);
-
-
 
     // Čia saugosim visus albumus
     let allAlbums = [];
     let httpRequest;
 
     function init() {
-
         // Gausime albumus iš json-server
         httpRequest = new XMLHttpRequest();
 
@@ -75,6 +54,7 @@ var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkim
     let imageElement = document.querySelector("#image");
     let genreElement = document.querySelector("#genre");
 
+
     function addAlbum() {
         // nuskaitome laukelių reikšmes
         let artist = artistElement.value;
@@ -83,7 +63,7 @@ var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkim
         let image = imageElement.files[0];
         let genre = genreElement.value;
 
-        if (!artist || !album || !date || !image) {
+        if (!artist || !album || !date) {
             alert("Neįvesti visi laukeliai");
             return;
         }
@@ -97,22 +77,16 @@ var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkim
             "artist": artist,
             "album": album,
             "date": date,
-            "image": image.name,
+            "image": image ? image.name || "" : "",
             "genre": genre
         }
 
         // Patikrinime ar albumas jau buvo įvestas
-        // if (checkForDuplicates(record)){
-        //     alert("Toks albumas jau išsaugotas");
-        //     return;
-        // }
+        if (checkForDuplicates(record)) {
+            alert("Toks albumas jau išsaugotas");
+            return;
+        }
 
-        // Saugome albumą
-        // albumList.push(record);
-
-        // Išsaugoti duomenis į localStorage
-        // let albumsJSON = JSON.stringify(albumList);
-        // localStorage.setItem("albums", albumsJSON);
 
         // Siunčiame albumo duomenis į serverį
         let httpRequest = new XMLHttpRequest();
@@ -125,8 +99,6 @@ var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkim
             httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             httpRequest.send("artist=" + record.artist + "&album=" + record.album + "&date=" + record.date + "&image=" + record.image + "&genre=" + record.genre);
         }
-
-
 
         function saveAlbumToServer() {
             if (httpRequest.readyState === XMLHttpRequest.DONE) {
@@ -142,17 +114,13 @@ var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkim
             }
         }
 
-
-        // Atnaujinkim albumų sąrašą
-        // renderAlbums();
-
         // Išvalykim formą
         clearForm();
     }
 
     function checkForDuplicates(record) {
         let isDuplicate = false;
-        albumList.forEach(function (item) {
+        allAlbums.forEach(function (item) {
             if (item.artist === record.artist && item.album === record.album && item.date === record.date) {
                 isDuplicate = true;
             }
@@ -178,14 +146,8 @@ var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkim
 
     function clearForm() {
         formElement.reset();
-
-        // arba
-        // artistElement.value = "";
-        // albumElement.value = "";
-        // releaseDateElement.value = "";
-        // imageElement.value = "";
     }
-    //funkcija kuri atvaizduoja albumus
+
     function renderAlbums(albumList) {
         // Patikrinti ar yra išsaugotų albumų
         // Jei nėra - nutraukti funkcijos vykdymą
@@ -194,26 +156,26 @@ var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkim
         // Jei yra, kuriame ciklą ir į rezultatą susidedam visų albumų HTML
         let albumHtml = "";
         for (let album of albumList) {
+
             let genreHtml = "";
 
             if (album.genre) {
-                let genreList = (album.genre).split(","); //
+                let genreList = (album.genre).split(",");
 
                 for (genre of genreList) {
-                    genreHtml += `<span class="badge badge-pill badge-info">${genre.trim()}</span>\n`
+                    genreHtml += `<span class="badge badge-pill badge-info">${genre.trim()}</span>\n`;
                 }
-
             }
+
             albumHtml += `
             <div class="album clearfix">
                 <img src="img/${album.image}" alt="${album.artist} - ${album.album}">
-                <h2>${album.album}<span>${album.artist}</span></h2>
+                <h2>${album.album} - ${album.artist} <span class="text-secondary">(${album.date})</span></h2>
                 ${genreHtml}
-                <br>
-                <date>${album.date}</date>
-                <div class= "text-right">
-                <button type="button" class="btn btn-danger btn-delete-album">Istrinti</button>
+                <div class="text-right mt-5">
+                    <button type="button" class="btn btn-light btn-delete-album" data-id="${album.id}">Ištrinti</button>
                 </div>
+                
             </div>
             <hr>
         `;
@@ -223,18 +185,128 @@ var app = (function () {// Suraskite H1 DOM elementą pagal klasę ir priskirkim
         let albumListElement = document.querySelector(".album-list");
         albumListElement.innerHTML = albumHtml;
 
+        // Surandam visus mygtukus
         let deleteButtons = document.querySelectorAll(".btn-delete-album");
-        for (btn of deleteButtons){
+
+        // Registruojam mygtukams event'us
+        for (btn of deleteButtons) {
             btn.addEventListener("click", deleteAlbum);
         }
     }
-function deleteAlbum() {
-    console.log("Trinsim albuma cia");
-}
+
+    function deleteAlbum() {
+        let doDelete = confirm("Ar tkrai nori istrinti?");
+        if (doDelete === true) {
+            let id = this.getAttribute("data-id");
+            //trinam is UI
+            let albumDiv = this.parentElement.parentElement.remove();
+            
+            //Trinam is serverio
+            deleteAlbumFromDB(id);
+
+            console.log("trinsim albuma cia", this);
+        }
+    }
+
+    function deleteAlbumFromDB(id) {
+        let httpRequest = new XMLHttpRequest();
+
+        if (!httpRequest) {
+            alert("Naršyklė nepalaiko AJAX");
+        } else {
+            httpRequest.onreadystatechange = deleteAlbumResult;
+            httpRequest.open('DELETE', 'http://localhost:3000/albums/' + id);
+            httpRequest.send();
+
+        }
+
+        function deleteAlbumResult() {
+            if (httpRequest.readyState === XMLHttpRequest.DONE) {
+                if (httpRequest.status === 200) {
+                    console.log("Yes, ištryniau");
+                } else {
+                    console.log("Nope, neištryniau");
+                }
+            }
+        }
+    }
+//albumu rikiavimas
+let sortByElement = document.querySelector(".sort-by");
+   let sortBtnElement = document.querySelector(".btn-sort");
+   let sortBy
+   sortBtnElement.addEventListener("click", sortAlbumsClick);
+
+   function sortAlbumsClick() {
+       sortBy = sortByElement.value;
+       let albumsSorted
+
+       if (sortBy === "album") {
+           albumsSorted = allAlbums.sort(sortByAlbum);
+
+       } else if (sortBy === "artist") {
+           albumsSorted = allAlbums.sort(sortByArtist);
+       }  else {
+           albumsSorted = allAlbums.sort(sortByYear);
+       }
+
+       renderAlbums(albumsSorted);
+   }
+
+   function sortByAlbum(a, b) {
+       if (a.album > b.album) {
+           return 1;
+       }
+       if (a.album < b.album) {
+           return -1;
+       }
+   }
+
+   function sortByArtist(a, b) {
+       if (a.artist > b.artist) {
+           return 1;
+       }
+       if (a.artist < b.artist) {
+           return -1;
+       }
+   }
+
+   function sortByYear(a, b) {
+       if (a.date > b.date) {
+           return 1;
+       }
+       if (a.date < b.date) {
+           return -1;
+       }
+   }
 
     return {
         "init": init
     }
-    //<span class="badge badge-pill badge-info">Electronic</span>
+
 })();
+
 app.init();
+
+
+//Konstruktoriaus funkcija
+/*let volvo ={
+    "make":"Volvo",
+    "model":"XC90",
+    "year":"2006"
+
+}
+
+let saab ={
+    "make":"Saab",
+    "model":"93",
+    "year":"2001"
+
+}*/
+
+function Car(make, model, year) {
+    this.make = make;
+    this.model = model;
+    this.year = year;
+}
+
+let volvo = new Car("volvo", "XC90", 2006);
